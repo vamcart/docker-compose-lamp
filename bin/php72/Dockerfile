@@ -59,6 +59,32 @@ RUN apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ 
 RUN docker-php-ext-install -j$(nproc) gd
 
+# Install IonCube
+
+RUN ARCH=$(uname -m) && \
+    PHP_VERSION=$(php -v | head -n 1 | awk '{ print $2 }') && \
+    PHP_MAJOR_MINOR=$(echo "${PHP_VERSION}" | cut -d. -f1,2) && \
+    IONCUBE_LOADER="ioncube_loader_lin_${PHP_MAJOR_MINOR}.so" && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        IONBUDE_SRC="https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz"; \
+    elif [ "$ARCH" = "x86" ]; then \
+        IONBUDE_SRC="https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86.tar.gz"; \
+    elif [ "$ARCH" = "armv7l" ]; then \
+        IONBUDE_SRC="https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_armv7l.tar.gz"; \
+    elif [ "$ARCH" = "arm64" ]; then \
+        IONBUDE_SRC="https://downloads.ioncube.com/loader_downloads/ioncube_loaders_dar_arm64.tar.gz"; \
+    elif [ "$ARCH" = "i686" ]; then \
+        IONBUDE_SRC="https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86.tar.gz"; \
+    else \
+        echo "Unsupported architecture"; exit 1; \
+    fi && \
+    cd /usr/src && \
+    curl -o ioncube.tar.gz ${IONBUDE_SRC} && \
+    tar -xvvzf ioncube.tar.gz && \
+    cp ioncube/${IONCUBE_LOADER} /usr/local/lib/php/extensions/* && \
+    rm -Rf ioncube.tar.gz ioncube && \
+    echo "zend_extension=${IONCUBE_LOADER}" > /usr/local/etc/php/conf.d/docker-php-ext-ioncube.ini
+    
 # Insure an SSL directory exists
 RUN mkdir -p /etc/apache2/ssl
 
