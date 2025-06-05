@@ -229,6 +229,40 @@ Example:
 }
 ```
 
+Пример для локального домена https://vamshop.loc
+
+В VS Code мы открыли корневую папку с www файлами /var/www/html/vamshop
+
+Нужно правильно указать путь из настроек сервера.
+
+Cмотрите, как у Вас настроен DocumentRoot в веб-сервере /config/vhosts/vamshop.conf
+
+У меня указан /var/www/html/vamshop
+
+Значит настройка в launch.json будет:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for Xdebug",
+      "type": "php",
+      "request": "launch",
+      // "port": 9000, // Xdebug 2
+      "port": 9003, // Xdebug 3
+      "pathMappings": {
+        "/var/www/html/vamshop": "${workspaceFolder}"
+      }
+    }
+  ]
+}
+```
+
+Если настроено неправильно, что breakpoint с красного будет меняться на серый - Unverified breakpoint.
+
+Это как раз значит, что неправильно настроили пути.
+
 Now, make a breakpoint and run debug.
 
 **Tip!** After theses configurations, you may need to restart container.
