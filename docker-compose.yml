@@ -29,6 +29,8 @@ services:
       XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=${XDEBUG_PORT}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    security_opt:
+      - no-new-privileges=false      
   database:
     build:
       context: "./bin/${DATABASE}"
@@ -40,7 +42,6 @@ services:
       - ${MYSQL_INITDB_DIR-./config/initdb}:/docker-entrypoint-initdb.d
       - ${MYSQL_DATA_DIR-./data/mysql}:/var/lib/mysql
       - ${MYSQL_LOG_DIR-./logs/mysql}:/var/log/mysql
-      - ${MYSQL_CONF_DIR-./config/mysql}:/etc/mysql/conf.d      
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -72,3 +73,21 @@ services:
     image: redis:latest
     ports:
       - "127.0.0.1:${HOST_MACHINE_REDIS_PORT}:6379"
+  manticore:
+    container_name: manticore
+    image: manticoresearch/manticore
+    restart: "always"
+    ports:
+      - 127.0.0.1:${HOST_MACHINE_MANTICORE_PORT}:9306
+      - 127.0.0.1:${HOST_MACHINE_MANTICORE_PORT2}:9308
+    ulimits:
+      nproc: 65535
+      nofile:
+         soft: 65535
+         hard: 65535
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ${MANTICORE_DATA_DIR-./data/manticore}:/var/lib/manticore
+      - ./config/manticore/manticore.conf:/etc/manticoresearch/manticore.conf # uncomment if you use a custom config
