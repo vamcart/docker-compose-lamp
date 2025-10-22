@@ -90,4 +90,4 @@ services:
         hard: -1
     volumes:
       - ${MANTICORE_DATA_DIR-./data/manticore}:/var/lib/manticore
-      - ./config/manticore/manticore.conf:/etc/manticoresearch/manticore.conf # uncomment if you use a custom config
+      #- ./config/manticore/manticore.conf:/etc/manticoresearch/manticore.conf # uncomment if you use a custom config
