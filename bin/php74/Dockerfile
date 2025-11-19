@@ -51,6 +51,14 @@ RUN apt-get update && \
     pecl install imagick && \
     docker-php-ext-enable imagick
 
+# Install rdkafka
+RUN git clone https://github.com/edenhill/librdkafka.git && \
+    cd librdkafka && \
+    ./configure && \
+    make && make install && \
+    pecl install rdkafka && \
+    docker-php-ext-enable rdkafka
+
 # Other PHP7 Extensions
 
 RUN docker-php-ext-install pdo_mysql && \

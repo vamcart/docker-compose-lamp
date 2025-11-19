@@ -90,4 +90,44 @@ services:
         hard: -1
     volumes:
       - ${MANTICORE_DATA_DIR-./data/manticore}:/var/lib/manticore
-      #- ./config/manticore/manticore.conf:/etc/manticoresearch/manticore.conf # uncomment if you use a custom config
+      - ./config/manticore/lemmatizers:/etc/manticoresearch/lemmatizers
+      - ./config/manticore/manticore.conf:/etc/manticoresearch/manticore.conf # uncomment if you use a custom config
+  zookeeper:
+        image: confluentinc/cp-zookeeper:7.3.2
+        container_name: zookeeper
+        restart: unless-stopped
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+        image: wurstmeister/kafka:latest
+        container_name: kafka
+        restart: unless-stopped
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9094
+            KAFKA_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9094
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        ports:
+            - "127.0.0.1:9094:9094"
+        depends_on:
+            - zookeeper
+
+  kafka-ui:
+        image: provectuslabs/kafka-ui:v0.6.1
+        container_name: kafkaui
+        restart: unless-stopped
+        environment:
+            KAFKA_CLUSTERS_0_NAME: local
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+            KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+        ports:
+            - "127.0.0.1:8082:8080"
+        depends_on:
+            - webserver
+            - kafka
+                  
