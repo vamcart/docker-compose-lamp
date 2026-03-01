@@ -48,11 +48,11 @@ RUN pecl install redis-5.1.1 && \
     docker-php-ext-enable redis
 
 # Install imagick
-RUN apt-get update && \
-    apt-get -y --no-install-recommends install --fix-missing libmagickwand-dev && \
-    rm -rf /var/lib/apt/lists/* && \
-    pecl install imagick && \
-    docker-php-ext-enable imagick
+#RUN apt-get update && \
+    #apt-get -y --no-install-recommends install --fix-missing libmagickwand-dev && \
+    #rm -rf /var/lib/apt/lists/* && \
+    #pecl install imagick && \
+    #docker-php-ext-enable imagick
 
 # Install rdkafka
 RUN git clone https://github.com/edenhill/librdkafka.git && \
