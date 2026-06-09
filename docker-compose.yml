@@ -134,7 +134,7 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -163,6 +163,10 @@ services:
       - DS_PROMETHEUS=prometheus
     volumes:
       # Mount the individual file to Grafana's internal provisioning directory
-      - ./datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      # Mount the configuration provider file
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      # Mount the folder containing your JSON dashboard files
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
       - prometheus
