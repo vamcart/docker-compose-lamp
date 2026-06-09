@@ -1,0 +1,12 @@
+# grafana/provisioning/dashboards/dashboards.yaml
+apiVersion: 1
+
+providers:
+  - name: 'Local Dashboards'
+    orgId: 1
+    folder: 'Custom Dashboards' # The Grafana UI folder name
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10   # Scans for local changes every 10 seconds
+    options:
+      path: /var/lib/grafana/dashboards # Folder inside the container
