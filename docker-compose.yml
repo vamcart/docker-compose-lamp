@@ -130,4 +130,39 @@ services:
         depends_on:
             - webserver
             - kafka
-                  
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+  mysql-exporter:
+    image: prom/mysqld-exporter
+    container_name: mysql-exporter
+    environment:
+      - DATA_SOURCE_NAME=root:tiger@(database:3306)/
+    command:
+     - "--mysqld.username=root:tiger"
+     - "--mysqld.address=database:3306"
+    ports:
+      - "9104:9104"
+    depends_on:
+      - database
+    restart: unless-stopped      
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - DS_PROMETHEUS=prometheus
+    volumes:
+      # Mount the individual file to Grafana's internal provisioning directory
+      - ./datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+    depends_on:
+      - prometheus

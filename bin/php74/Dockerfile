@@ -23,6 +23,7 @@ libsqlite3-dev \
 libsqlite3-0 && \
     apt-get -y --no-install-recommends install default-mysql-client \
 zlib1g-dev \
+libxml2-dev \
 libzip-dev \
 libicu-dev && \
     apt-get -y --no-install-recommends install --fix-missing apt-utils \
@@ -44,15 +45,15 @@ RUN pecl install xdebug-3.1.4 && \
     mkdir /var/log/xdebug
 
 # Install redis
-RUN pecl install redis-5.1.1 && \
+RUN pear update-channels && pecl update-channels && pecl install redis-5.1.1 && \
     docker-php-ext-enable redis
 
 # Install imagick
-RUN apt-get update && \
-    apt-get -y --no-install-recommends install --fix-missing libmagickwand-dev && \
-    rm -rf /var/lib/apt/lists/* && \
-    pecl install imagick && \
-    docker-php-ext-enable imagick
+#RUN apt-get update && \
+    #apt-get -y --no-install-recommends install --fix-missing libmagickwand-dev && \
+    #rm -rf /var/lib/apt/lists/* && \
+    #pecl install imagick && \
+    #docker-php-ext-enable imagick
 
 # Install rdkafka
 RUN git clone https://github.com/edenhill/librdkafka.git && \
@@ -75,6 +76,7 @@ RUN docker-php-ext-install pdo_mysql && \
     docker-php-ext-install -j$(nproc) intl && \
     docker-php-ext-install mbstring && \
     docker-php-ext-install gettext && \
+    docker-php-ext-install xml && \
     docker-php-ext-install calendar && \
     docker-php-ext-install exif
 
