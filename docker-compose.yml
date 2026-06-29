@@ -27,6 +27,9 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       HOST_MACHINE_MYSQL_PORT: ${HOST_MACHINE_MYSQL_PORT}
       XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=${XDEBUG_PORT}"
+      VAR_DUMPER_SERVER: buggregator:9912
+      RAY_HOST: buggregator
+      RAY_PORT: 8005
     extra_hosts:
       - "host.docker.internal:host-gateway"
     security_opt:
@@ -185,7 +188,7 @@ services:
 
   # 3. PMM Client Service
   pmm-client:
-    image: percona/pmm-client:2
+    image: percona/pmm-client:3
     container_name: pmm-client
     restart: always
     environment:
@@ -200,3 +203,12 @@ services:
     depends_on:
       - pmm-server
       - database
+  # Buggregator Debug Server
+  buggregator:
+    image: ghcr.io/buggregator/server:latest
+    container_name: buggregator_server
+    ports:
+      - "127.0.0.1:8005:8000"       # Web UI, Sentry, Ray, Inspector
+      - "127.0.0.1:1025:1025"       # SMTP Fake Mail Server
+      - "127.0.0.1:9912:9912"       # Symfony VarDumper Server
+      - "127.0.0.1:9913:9913"       # Monolog Socket      
